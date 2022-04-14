@@ -15,7 +15,7 @@ const topics = {
 
 function App() {
   const [postInfos, setPostInfos] = useState([])
-  const [isSearching, setIsSearching] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const [postInput, setPostInput] = useState('')
   const [topicToSave, setTopicToSave] = useState('')
   const [topicToFilter, setTopicToFilter] = useState('')
@@ -24,6 +24,7 @@ function App() {
 
   useEffect(() => {
     getPostInfo()
+    setIsLoading(true)
   }, [])
 
   async function createPost() {
@@ -76,7 +77,6 @@ function App() {
   }
 
   async function getPostInfo(topicFilter = null) {
-    setIsSearching(true)
     const query = buildQuery(topicFilter);
     const results = await arweave.api.post('/graphql', query)
       .catch(err => {
@@ -88,7 +88,7 @@ function App() {
     const posts = await Promise.all(
       edges.map(async edge => await createPostInfo(edge.node))
     )
-    setIsSearching(false)
+    setIsLoading(false)
     setPostInfos(posts)
     console.log('posts: ', posts)
   }
@@ -162,10 +162,10 @@ function App() {
         )
       }
       {
-        isSearching && <h1>Loading chat...</h1>
+        isLoading && <h1>Loading chat...</h1>
       }
       {
-        !isSearching && (
+        !isLoading && (
           <>
             <div className={filtersContainerStyle}>
               <h3>Filter by topic</h3>
