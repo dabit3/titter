@@ -1,102 +1,24 @@
 import styles from '../styles/Home.module.css'
 import { useContext, useState, useEffect, useRef } from 'react'
-import { utils } from 'ethers'
+import { utils, providers } from 'ethers'
 import BigNumber from "bignumber.js"
 import { css } from '@emotion/css'
 import { BundlrContext } from '../context'
 import { getRecord, webClient } from '../utils'
+import { create } from 'ipfs-http-client';
+
+const client = create('https://ipfs.infura.io:5001/api/v0')
 
 export default function Account() {
-  const [balance, setBalance] = useState(null)
   const [price, setPrice] = useState(null)
+  const [profileImage, setProfileImage] = useState(null)
   const [bio, setBio] = useState('')
   const [twitter, setTwitter] = useState('')
   const [name, setName] = useState('')
-  const [profile, setProfile] = useState({})
-  const [localDid, setDid] = useState(null)
-  const [selfId, setSelfId] = useState(null)
-  const [ceramicLoaded, setCeramicLoaded] = useState(false)
   const [showGreeting, setShowGreeting] = useState(false)
-  const selfIdRef = useRef(null)
-  const didRef = useRef(null)
-  selfIdRef.current = selfId
-  didRef.current = localDid
 
   const context = useContext(BundlrContext)
-  const { connect, bundlrInstance } = context
-
-  useEffect(() => {
-    if (bundlrInstance) {
-      fetchBalance()
-    }
-  }, [bundlrInstance])
-
-  async function connectCeramic() {
-    const cdata = await webClient()
-    const { id, selfId, error } = cdata
-    if (error) {
-      console.log('error: ', error)
-      return
-    }
-    setDid(id)
-    setSelfId(selfId)
-    const data = await selfId.get('basicProfile', id)
-    if (data) {
-      setProfile(data)
-    } else {
-      setShowGreeting(true)
-    }
-    setCeramicLoaded(true)
-  }
-
-  async function updateProfile() {
-    if (!twitter && !bio && !name) {
-      console.log('error... no profile information submitted')
-      return
-    }
-    if (!selfId) {
-      await connect()
-    }
-    const user = {...profile}
-    if (twitter) user.twitter = twitter
-    if (bio) user.bio = bio
-    if (name) user.name = name
-    await selfIdRef.current.set('basicProfile', user)
-    setLocalProfileData()
-    console.log('profile updated...')
-  }
-
-  async function readProfile() {
-    try {
-      const { record } = await getRecord()
-      console.log('record: ', record)
-      if (record) {
-        setProfile(record)
-      } else {
-        setShowGreeting(true)
-      }
-    } catch (error) {
-      setShowGreeting(true)
-    }
-    setCeramicLoaded(true)
-  }
-
-  async function setLocalProfileData() {
-    try {
-      const data = await selfIdRef.current.get('basicProfile', didRef.current.id)
-      if (!data) return
-      setProfile(data)
-      setShowGreeting(false)
-    } catch (error) {
-      console.log('error', error)
-    }
-  }
-
-  async function fetchBalance() {
-    const data = await bundlrInstance.getLoadedBalance() // 109864 
-    console.log('data: ', utils.formatEther(data.toString()))
-    setBalance(utils.formatEther(data.toString()))
-  }
+  const { connect, bundlrInstance, balance, profile, setProfile, ceramicLoaded, connectCeramic, selfId } = context
 
   async function connectWallet() {
     await connect()
@@ -118,42 +40,143 @@ export default function Account() {
     }
   }
 
+  async function updateProfile() {
+    if (!twitter && !bio && !name && !profileImage) {
+      console.log('error... no profile information submitted')
+      return
+    }
+    if (!selfId) {
+      await connect()
+    }
+    const user = {...profile}
+    if (twitter) user.twitter = twitter
+    if (bio) user.bio = bio
+    if (name) user.name = name
+    if (profileImage) user.profileImage = profileImage
+    await selfId.set('basicProfile', user)
+    setProfile(user)
+    console.log('profile updated...')
+  }
+
+  async function setImage(e) {
+    const added = await client.add(e.target.files[0])
+    const url = `https://ipfs.infura.io/ipfs/${added.path}`
+    setProfileImage(url)
+  }
+  
+  console.log('profile : ', profile)
+
+  const profileExists = Object.keys(profile).length
+
   return (
     <div className={styles.container}>
-      <h2>Account Information</h2>
-      {
-        !bundlrInstance && <button className={button} onClick={connectWallet}>Connect wallet to view balance.</button>
-      }
+      <h2>Profile Information</h2>
       {
         !ceramicLoaded && (
-          <>
           <button
             onClick={connectCeramic}
             className={button}
-        >Authenticate</button>
-        
-        <button className={button} onClick={readProfile}>Read Profile</button>
-        </>
+          >Authenticate to { !profileExists ? "read and update " : "update "}profile</button>
+        )
+      }
+      {
+        ceramicLoaded && (
+          <div className={formStyle}>
+            <input className="pt-4 rounded bg-gray-100 px-3 py-2" placeholder="Name" onChange={e => setName(e.target.value)} />
+            <input className="pt-4 rounded bg-gray-100 px-3 py-2 my-2" placeholder="Bio" onChange={e => setBio(e.target.value)} />
+            <input className="pt-4 rounded bg-gray-100 px-3 py-2" placeholder="Twitter username" onChange={e => setTwitter(e.target.value)} />
+            <div className={filePickerContainerStyle}>
+              <label>Set profile image</label>
+              <input
+                type="file"
+                onChange={setImage}
+              />
+            </div>
+            <button className={button} onClick={updateProfile}>Update Profile</button>
+            {
+              profileImage && (
+                <img className={profileImageStyle} src={profileImage} />
+              )
+            }
+          </div>
+        )
+      }
+      {
+        profileExists ? (
+          <div>
+            <h2 >{profile.name}</h2>
+            <p >{profile.bio}</p>
+            {
+              profile.twitter && (
+                <p >Follow me on Twitter - @{profile.twitter}</p>
+              )
+            }
+            {
+              profile.profileImage && (
+                <img src={profile.profileImage} style={{width: '200px'}} />
+              )
+            }
+          </div>
+        ) : null
+      }
+      <div className={accountInfoStyle}>
+      <h2>Account Information</h2>
+      {
+        !bundlrInstance && (
+          <>
+            <h3>Wallet not yet connected...</h3>
+            <button className={button} onClick={connectWallet}>Connect wallet to view balance.</button>
+          </>
         )
       }
       {
         bundlrInstance && (
           <div>
             <h3>Balance: {balance && Math.round(balance * 100000) / 100000}</h3>
-            <p>Fund wallet:</p>
             <input
               onChange={e => setPrice(e.target.value)}
-              placeholder="amount"
+              placeholder="Fund wallet"
               className={inputStyle}
             />
             <br />
-            <button className={button} onClick={fundWallet}>Send transaction</button>
+            <button className={button} onClick={fundWallet}>Transfer tokens</button>
           </div>
         )
       }
+      </div>
     </div>
   )
 }
+
+const formStyle = css`
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  input {
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 7px;
+    border-color: rgba(0, 0, 0, .05);
+    margin-bottom: 5px;
+    &:focus {
+      border-color: rgba(0, 0, 0, .1);
+      outline: none;
+    }
+  }
+`
+
+const filePickerContainerStyle = css`
+  margin-top: 10px;
+`
+
+const profileImageStyle = css`
+  width: 140px;
+`
+
+const accountInfoStyle = css`
+  margin-top: 20px;
+  border-top: 1px solid rgba(0, 0, 0, .1);
+`
 
 const inputStyle = css`
   padding: 12px;
