@@ -32,38 +32,43 @@ function MyApp({ Component, pageProps }) {
     if (!window.ethereum) return
     const provider = new providers.Web3Provider(window.ethereum)
     const accounts = await provider.listAccounts()
+    console.log('accounts: ', accounts)
     if (!accounts.length) return
     try {
       const { record } = await getRecord()
       console.log('record: ', record)
       if (record) {
         setProfile(record)
-      } else {
-        // setShowGreeting(true)
-      }
+      } else {}
     } catch (error) {
       console.log('error: ', error)
-      // setShowGreeting(true)
     }
-    // setCeramicLoaded(true)
   }
 
   async function connectCeramic() {
+    await connect()
     const cdata = await webClient()
     const { id, selfId, error } = cdata
     if (error) {
       console.log('error: ', error)
       return
     }
+    console.log({ id })
+    console.log({ selfId })
     setDid(id)
     setSelfId(selfId)
-    const data = await selfId.get('basicProfile', id)
-    if (data) {
-      setProfile(data)
-    } else {
-      setShowGreeting(true)
+    try {
+      const data = await selfId.get('basicProfile', id)
+      console.log('data: ', data)
+      if (data) {
+        setProfile(data)
+      } else {}
+      setCeramicLoaded(true)
+    } catch (err) {
+      console.log({ err })
+      connectCeramic()
     }
-    setCeramicLoaded(true)
+    // readProfile()
   }
 
   async function connect() {
@@ -76,6 +81,7 @@ function MyApp({ Component, pageProps }) {
     await bundlr.ready()  
     setBundlrInstance(bundlr)
   }
+  
   return (
     <div>
       <nav className={navStyle}>
@@ -99,7 +105,8 @@ function MyApp({ Component, pageProps }) {
           setProfile,
           connectCeramic,
           ceramicLoaded,
-          selfId
+          selfId,
+          fetchBalance
         }}>
           <Component {...pageProps} />
         </BundlrContext.Provider>

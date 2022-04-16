@@ -4,13 +4,15 @@ import { css } from '@emotion/css'
 import formatDistance from 'date-fns/formatDistance'
 import { BundlrContext } from '../context'
 import ReactMarkdown from 'react-markdown'
+import Link from 'next/link'
 
 const topics = {
   nfts: 'nfts',
   defi: 'defi',
   engineering: 'engineering',
   daos: 'daos',
-  infrastructure: 'infrastructure'
+  web3: 'web3',
+  infrastructure: 'infrastructure',
 }
 
 function App() {
@@ -20,7 +22,7 @@ function App() {
   const [topicToSave, setTopicToSave] = useState('')
   const [topicToFilter, setTopicToFilter] = useState('')
   const context = useContext(BundlrContext)
-  const { connect, bundlrInstance } = context
+  const { balance, connectCeramic, bundlrInstance, profile } = context
 
   useEffect(() => {
     getPostInfo()
@@ -28,9 +30,11 @@ function App() {
   }, [])
 
   async function createPost() {
+    console.log({ profile })
+
     if (!postInput) return
     const tags = [
-      { name: "App-Name", value: "Web3ChatterTest" },
+      { name: "App-Name", value: "Web3ChatterTest1" },
       { name: "Content-Type", value: "text/plain" },
     ]
 
@@ -45,7 +49,10 @@ function App() {
 
     const post = {
       post: postInput,
-      createdAt: new Date()
+      createdAt: new Date(),
+      createdBy: bundlrInstance.address,
+      username: profile && profile.name ? profile.name : null,
+      profileImage: profile && profile.profileImage ? profile.profileImage : null
     }
   
     let tx = await bundlrInstance.createTransaction(JSON.stringify(post), { tags })
@@ -63,7 +70,10 @@ function App() {
           request: {
             data: {
               post: postInput,
-              createdAt: post.createdAt
+              createdAt: post.createdAt,
+              createdBy: bundlrInstance.address,
+              username: profile && profile.name ? profile.name : null,
+              profileImage: profile && profile.profileImage ? profile.profileImage : null
             }
           }
         }, ...postInfos]
@@ -88,9 +98,10 @@ function App() {
     const posts = await Promise.all(
       edges.map(async edge => await createPostInfo(edge.node))
     )
+    const sorted = posts.sort((a, b) => new Date(b.request.data.createdAt) - new Date(a.request.data.createdAt))
     setIsLoading(false)
-    setPostInfos(posts)
-    console.log('posts: ', posts)
+    setPostInfos(sorted)
+    console.log('posts: ', sorted)
   }
 
   function onChange(e) {
@@ -132,13 +143,24 @@ function App() {
       setTopicToSave(topic)
     }
   }
+
+  const balanceZero = balance === "0.0"
   
   return (
     <div className="App">
       {
         !bundlrInstance ? (
           <div>
-             <button className={button} onClick={connect}>Connect to start chatting!</button>
+             <button className={button} onClick={connectCeramic}>Connect wallet to start chatting!</button>
+          </div>
+        ) : balanceZero ? (
+          <div>
+            <h4>
+              Balance empty. Please fund wallet
+              <Link href="/account">
+                <a> here.</a>
+              </Link>
+            </h4>
           </div>
         ) : (
           <div className={postInputContainerStyle}>
@@ -184,10 +206,14 @@ function App() {
               postInfos.map((post, i) => (
                 post.request.data.post && (
                   <div className={postWrapper} key={i} >
-                    <h1>{post.emoji}</h1>
+                    <img
+                      src={post.request.data.profileImage}
+                      className={profileImageStyle}
+                    />
                     <div className={postContainer}>
                       <ReactMarkdown>{post.request.data.post}</ReactMarkdown>
-                      <p>{formatDistance(new Date(), new Date(post.request.data.createdAt)) + 'ago'}</p>
+                      <p>{post.request.data.username ? post.request.data.username : post.request.data.createdBy}</p>
+                      <p>{formatDistance(new Date(), new Date(post.request.data.createdAt)) + ' ago'}</p>
                     </div>
                   </div>
                 )
@@ -204,6 +230,7 @@ function App() {
 const postWrapper = css`
   border-bottom: 1px solid rgba(0, 0, 0, .2);
   display: flex;
+  align-items: flex-start;
   h1 {
     font-size: 40px;
     margin: 20px 30px 0px 0px;
@@ -265,6 +292,15 @@ const filtersContainerStyle = css`
   h3 {
     margin-bottom: 5px;
   }
+`
+
+const profileImageStyle = css`
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 28px;
+  margin-top: 26px;
+  margin-right: 12px;
 `
 
 const filtersListStyle = css`

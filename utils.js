@@ -25,7 +25,7 @@ export const createPostInfo = async (node) => {
 let tags = [
   {
     name: "App-Name",
-    values: ["Web3ChatterTest"]
+    values: ["Web3ChatterTest1"]
   },
   {
     name: "Content-Type",
@@ -142,6 +142,7 @@ export async function getRecord({
   schema = 'basicProfile',
   address = null
 } = {}) {
+  console.log('getting record...')
   let ethereum = window.ethereum;
   let record;
 
@@ -156,9 +157,11 @@ export async function getRecord({
   if (!address) {
    [address] = await ethereum.request({ method: 'eth_requestAccounts' })
   }
+  console.log('address: ', address)
   const capLink = caip10Links[network]
   const did = await client.getAccountDID(`${address}${capLink}`)
-  
+  console.log('did: ', did)
+  console.log('capLink: ', capLink)
   record = await client.get(schema, did)
   console.log('record: ', record)
   return {

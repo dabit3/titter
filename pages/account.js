@@ -15,19 +15,20 @@ export default function Account() {
   const [bio, setBio] = useState('')
   const [twitter, setTwitter] = useState('')
   const [name, setName] = useState('')
-  const [showGreeting, setShowGreeting] = useState(false)
 
   const context = useContext(BundlrContext)
-  const { connect, bundlrInstance, balance, profile, setProfile, ceramicLoaded, connectCeramic, selfId } = context
+  const { connect, fetchBalance, bundlrInstance, balance, profile, setProfile, ceramicLoaded, connectCeramic, selfId } = context
 
   async function connectWallet() {
     await connect()
   }
 
   async function fundWallet() {
+    if (!price) return
     const priceParced = parseInput(price)
     let response = await bundlrInstance.fund(priceParced);
-    console.log('response: ', response)
+    console.log('Wallet funded: ', response)
+    fetchBalance()
   }
 
   function parseInput (input) {
@@ -92,12 +93,12 @@ export default function Account() {
                 onChange={setImage}
               />
             </div>
-            <button className={button} onClick={updateProfile}>Update Profile</button>
             {
               profileImage && (
                 <img className={profileImageStyle} src={profileImage} />
               )
             }
+            <button className={button} onClick={updateProfile}>Update Profile</button>
           </div>
         )
       }
@@ -125,7 +126,7 @@ export default function Account() {
         !bundlrInstance && (
           <>
             <h3>Wallet not yet connected...</h3>
-            <button className={button} onClick={connectWallet}>Connect wallet to view balance.</button>
+            {/* <button className={button} onClick={connectWallet}>Connect wallet to view balance.</button> */}
           </>
         )
       }
@@ -171,6 +172,7 @@ const filePickerContainerStyle = css`
 
 const profileImageStyle = css`
   width: 140px;
+  margin-top: 10px;
 `
 
 const accountInfoStyle = css`
