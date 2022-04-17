@@ -36,7 +36,7 @@ function App() {
   async function poll() {
     setInterval(() => {
       getPostInfo(topicFilterRef.current)
-    }, 3000)
+    }, 30000)
   }
 
   async function createPost() {
