@@ -50,3 +50,5 @@ npm install
 ```sh
 npm run dev
 ```
+
+4. To interact with the application, switch your wallet to [Polygon Network](https://docs.polygon.technology/docs/develop/metamask/config-polygon-on-metamask/)
