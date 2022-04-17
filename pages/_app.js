@@ -6,13 +6,13 @@ import { providers, utils } from "ethers"
 import { useState, useEffect } from 'react'
 import { BundlrContext } from '../context'
 import { getRecord, webClient } from '../utils'
+import Document, { Html, Head, Main, NextScript } from 'next/document'
 
 function MyApp({ Component, pageProps }) {
   const [bundlrInstance, setBundlrInstance] = useState(null)
   const [profile, setProfile] = useState({})
   const [balance, setBalance] = useState(null)
   const [ceramicLoaded, setCeramicLoaded] = useState(false)
-  const [did, setDid] = useState(null)
   const [selfId, setSelfId] = useState(null)
 
   useEffect(() => {
@@ -53,9 +53,6 @@ function MyApp({ Component, pageProps }) {
       console.log('error: ', error)
       return
     }
-    console.log({ id })
-    console.log({ selfId })
-    setDid(id)
     setSelfId(selfId)
     try {
       const data = await selfId.get('basicProfile', id)
@@ -68,7 +65,6 @@ function MyApp({ Component, pageProps }) {
       console.log({ err })
       connectCeramic()
     }
-    // readProfile()
   }
 
   async function connect() {
@@ -85,6 +81,8 @@ function MyApp({ Component, pageProps }) {
   return (
     <div>
       <nav className={navStyle}>
+        <img src="/stars.svg" style={{width: '70px'}} alt="An SVG of an eye" />
+
         <Link href="/">
           <a className={linkStyle}>
             <p>Home</p>
@@ -117,11 +115,15 @@ function MyApp({ Component, pageProps }) {
 
 const container = css`
   padding: 20px 100px;
+  width: 900px;
+  margin: 0 auto;
 `
 
 const navStyle = css`
   display: flex;
-  padding: 20px 30px;
+  padding: 20px 70px;
+  width: 900px;
+  margin: 0 auto;
 `
 
 const linkStyle = css`

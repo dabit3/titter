@@ -1,7 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&display=swap');
+
 html,
 body {
   padding: 0;
   margin: 0;
+  background-color: #0f0f0f;
+  color: #cad0db;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
@@ -13,4 +17,7 @@ a {
 
 * {
   box-sizing: border-box;
+  font-family: 'Amatic SC', cursive !important;
+  font-size: 26px;
+  font-weight: bold;
 }

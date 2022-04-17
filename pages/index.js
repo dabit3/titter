@@ -7,12 +7,13 @@ import ReactMarkdown from 'react-markdown'
 import Link from 'next/link'
 
 const topics = {
+  degen: 'degen',
   nfts: 'nfts',
   defi: 'defi',
-  engineering: 'engineering',
   daos: 'daos',
   web3: 'web3',
-  infrastructure: 'infrastructure',
+  solidity: 'solidity',
+  
 }
 
 function App() {
@@ -111,8 +112,7 @@ function App() {
   function checkTopicFilterStyle(topic) {
     if (topic === topicToFilter) {
       return css`
-        background-color: rgba(0, 0, 0, .1) !important;
-        color: #666  !important;
+        background-color: #cb3abf !important;
       `
     }
   }
@@ -130,8 +130,7 @@ function App() {
   function checkTopicStyle(topic) {
     if (topic === topicToSave) {
       return css`
-        background-color: rgba(0, 0, 0, .1) !important;
-        color: #666  !important;
+        background-color: #8926e4 !important;
       `
     }
   }
@@ -158,7 +157,7 @@ function App() {
             <h4>
               Balance empty. Please fund wallet
               <Link href="/account">
-                <a> here.</a>
+                <a className={fundWalletLinkStyle}> here.</a>
               </Link>
             </h4>
           </div>
@@ -243,7 +242,8 @@ const postContainer = css`
     margin-bottom: 0px;
   }
   p:nth-child(2) {
-    color: rgba(0, 0, 0, .5);
+    color: #9e54b9;
+    font-weight: bold !important;
     font-size: 14px;
   }
 `
@@ -256,7 +256,7 @@ const postInputContainerStyle = css`
 
 const postInputStyle = css`
   padding: 12px;
-  font-size: 16px;
+  font-size: 22px;
   border-radius: 7px;
   border-color: rgba(0, 0, 0, .05);
   &:focus {
@@ -267,18 +267,16 @@ const postInputStyle = css`
 
 const button = css`
   color: white;
-  background-color: #0070f3;
+  background-image: linear-gradient(120deg, #ff266a 0%, #c926ff 50%, #3d04cd 100%);
   padding: 13px 35px;
   border-radius: 7px;
   border: none;
-  font-size: 16px;
   outline: none;
-  box-shadow: 0 4px 14px 0 rgb(0 118 255 / 39%);
+  box-shadow: 0 6px 20px rgba(255, 38, 106, .15);
   cursor: pointer;
   transition: all .3s;
   &:hover {
-    background-color: rgba(0, 118, 255, 0.9);
-    box-shadow: 0 6px 20px rgb(0 118 255 / 23%);
+    box-shadow: 0 6px 20px rgba(255, 38, 106, .3);
   }
 `
 
@@ -306,13 +304,19 @@ const profileImageStyle = css`
 const filtersListStyle = css`
   display: flex;
   p {
-    background-color: black;
+    background-color: #1d1a27;
+    border: 1px solid #302c3f;
     color: white;
     margin-right: 6px;
     padding: 8px 24px;
-    border-radius: 20px;
+    border-radius: 27px;
     cursor: pointer;
+    font-weight: bold;
   }
+`
+
+const fundWalletLinkStyle = css`
+  color: #0080ff;
 `
 
 export default App;

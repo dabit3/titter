@@ -1,4 +1,4 @@
-import Arweave from 'arweave';
+import Arweave from 'arweave'
 import { Core } from '@self.id/core'
 const SID = require('@self.id/web')
 const { EthereumAuthProvider, SelfID, WebClient } = SID
@@ -90,7 +90,7 @@ export async function webClient({
   let ethereum = window.ethereum;
 
   if (!ethereum) return {
-    error: "No ethereum wallet detected"
+    error: 'No ethereum wallet detected'
   }
 
   if (!client) {
