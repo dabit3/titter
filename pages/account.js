@@ -106,8 +106,7 @@ export default function Account() {
       {
         profileExists ? (
           <div>
-            <h2 >{profile.name}</h2>
-            <p >{profile.bio}</p>
+            <h2 >{profile.name} - {profile.bio}</h2>
             {
               profile.twitter && (
                 <p >Follow me on Twitter - @{profile.twitter}</p>

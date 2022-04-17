@@ -237,14 +237,19 @@ const postWrapper = css`
 `
 
 const postContainer = css`
+  margin-bottom: 10px;
   p:first-child {
-    font-size: 20px;
+    font-size: 29px;
     margin-bottom: 0px;
   }
   p:nth-child(2) {
     color: #9e54b9;
     font-weight: bold !important;
-    font-size: 14px;
+    margin: 5px 0px;
+    font-size: 20px;
+  }
+  p:nth-child(3) {
+    margin: 0px;
   }
 `
 
