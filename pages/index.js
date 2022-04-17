@@ -1,5 +1,5 @@
-import { buildQuery, arweave, createPostInfo, getRandomEmoji } from '../utils'
-import { useState, useEffect, useContext } from 'react'
+import { buildQuery, arweave, createPostInfo } from '../utils'
+import { useState, useEffect, useContext, useRef } from 'react'
 import { css } from '@emotion/css'
 import formatDistance from 'date-fns/formatDistance'
 import { BundlrContext } from '../context'
@@ -22,20 +22,27 @@ function App() {
   const [postInput, setPostInput] = useState('')
   const [topicToSave, setTopicToSave] = useState('')
   const [topicToFilter, setTopicToFilter] = useState('')
+  const topicFilterRef = useRef(null)
   const context = useContext(BundlrContext)
   const { balance, connectCeramic, bundlrInstance, profile } = context
+  topicFilterRef.current = topicToFilter
 
   useEffect(() => {
     getPostInfo()
     setIsLoading(true)
+    poll()
   }, [])
 
-  async function createPost() {
-    console.log({ profile })
+  async function poll() {
+    setInterval(() => {
+      getPostInfo(topicFilterRef.current)
+    }, 3000)
+  }
 
+  async function createPost() {
     if (!postInput) return
     const tags = [
-      { name: "App-Name", value: "Web3ChatterTest1" },
+      { name: "App-Name", value: "TitterWeb3" },
       { name: "Content-Type", value: "text/plain" },
     ]
 
@@ -46,56 +53,53 @@ function App() {
       })
     }
 
-    console.log('tags: ', tags)
-
     const post = {
       post: postInput,
       createdAt: new Date(),
       createdBy: bundlrInstance.address,
       username: profile && profile.name ? profile.name : null,
-      profileImage: profile && profile.profileImage ? profile.profileImage : null
+      profileImage: profile && profile.profileImage ? profile.profileImage : null,
+      topic: topicToSave ? topicToSave : null
     }
   
     let tx = await bundlrInstance.createTransaction(JSON.stringify(post), { tags })
 
     try {
-      await tx.sign();
-      const data = await tx.upload();
+      await tx.sign()
+      await tx.upload()
 
       if (
         (topicToFilter && topicToSave == topicToFilter) ||
         !topicToFilter
       ) {
         const posts = [{
-          emoji: getRandomEmoji(),
           request: {
             data: {
               post: postInput,
               createdAt: post.createdAt,
               createdBy: bundlrInstance.address,
               username: profile && profile.name ? profile.name : null,
-              profileImage: profile && profile.profileImage ? profile.profileImage : null
+              profileImage: profile && profile.profileImage ? profile.profileImage : null,
+              topic: topicToSave ? topicToSave : null
             }
           }
         }, ...postInfos]
         setPostInfos(posts)
       }
       setPostInput('')
-      console.log('data: ', data)
     } catch (err) {
-      console.error(err);
+      console.error(err)
     }
   }
 
   async function getPostInfo(topicFilter = null) {
-    const query = buildQuery(topicFilter);
+    const query = buildQuery(topicFilter)
     const results = await arweave.api.post('/graphql', query)
       .catch(err => {
-        console.error('GraphQL query failed');
+        console.error('GraphQL query failed')
          throw new Error(err);
       });
-    const edges = results.data.data.transactions.edges;
-    console.log("edges: ", edges);
+    const edges = results.data.data.transactions.edges
     const posts = await Promise.all(
       edges.map(async edge => await createPostInfo(edge.node))
     )
@@ -112,7 +116,7 @@ function App() {
   function checkTopicFilterStyle(topic) {
     if (topic === topicToFilter) {
       return css`
-        background-color: #cb3abf !important;
+        background-color: #ff5d9d !important;
       `
     }
   }
@@ -130,7 +134,7 @@ function App() {
   function checkTopicStyle(topic) {
     if (topic === topicToSave) {
       return css`
-        background-color: #8926e4 !important;
+        background-color: #b84cff !important;
       `
     }
   }
@@ -189,7 +193,10 @@ function App() {
         !isLoading && (
           <>
             <div className={filtersContainerStyle}>
-              <h3>Filter by topic</h3>
+              <div className={filterheaderStyle}>
+                <h3>Filter by topic</h3>
+                <img onClick={() => getPostInfo()} className={refreshImageStyle} src="/refresh.svg" />
+              </div>
               <div className={filtersListStyle}>
                 {
                   Object.keys(topics).map((topic, i) => (
@@ -210,9 +217,14 @@ function App() {
                       className={profileImageStyle}
                     />
                     <div className={postContainer}>
-                      <ReactMarkdown>{post.request.data.post}</ReactMarkdown>
                       <p>{post.request.data.username ? post.request.data.username : post.request.data.createdBy}</p>
-                      <p>{formatDistance(new Date(), new Date(post.request.data.createdAt)) + ' ago'}</p>
+                      <ReactMarkdown>{post.request.data.post}</ReactMarkdown>
+                      <div className={timeAndTopicContainerStyle}>
+                        <p>{formatDistance(new Date(), new Date(post.request.data.createdAt)) + ' ago'}</p>
+                        {
+                          post.request.data.topic && <p>{post.request.data.topic}</p>
+                        }
+                      </div>
                     </div>
                   </div>
                 )
@@ -239,17 +251,15 @@ const postWrapper = css`
 const postContainer = css`
   margin-bottom: 10px;
   p:first-child {
-    font-size: 29px;
+    color: #9e54b9;
+    font-size: 22px;
     margin-bottom: 0px;
+
   }
   p:nth-child(2) {
-    color: #9e54b9;
-    font-weight: bold !important;
-    margin: 5px 0px;
-    font-size: 20px;
-  }
-  p:nth-child(3) {
-    margin: 0px;
+    font-size: 29px;
+    margin: 17px 0px;
+    font-size: 28px;
   }
 `
 
@@ -297,6 +307,18 @@ const filtersContainerStyle = css`
   }
 `
 
+const filterheaderStyle = css`
+  display: flex;
+  align-items: flex-start;
+  h3 {
+    margin: 0px;
+  }
+  img {
+    margin-left: 15px;
+    cursor: pointer;
+  }
+`
+
 const profileImageStyle = css`
   width: 56px;
   height: 56px;
@@ -322,6 +344,23 @@ const filtersListStyle = css`
 
 const fundWalletLinkStyle = css`
   color: #0080ff;
+`
+
+const refreshImageStyle = css`
+  width: 30px;
+`
+
+const timeAndTopicContainerStyle = css`
+  display: flex;
+  p:first-child {
+    margin: 0;
+  }
+  p:nth-child(2) {
+    margin: 0;
+    margin-left: 10px;
+    font-size: 22px;
+    color: #ff5d9d;
+  }
 `
 
 export default App;

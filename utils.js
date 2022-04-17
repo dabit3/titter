@@ -25,7 +25,7 @@ export const createPostInfo = async (node) => {
 let tags = [
   {
     name: "App-Name",
-    values: ["Web3ChatterTest1"]
+    values: ["TitterWeb3"]
   },
   {
     name: "Content-Type",

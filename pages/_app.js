@@ -6,7 +6,6 @@ import { providers, utils } from "ethers"
 import { useState, useEffect } from 'react'
 import { BundlrContext } from '../context'
 import { getRecord, webClient } from '../utils'
-import Document, { Html, Head, Main, NextScript } from 'next/document'
 
 function MyApp({ Component, pageProps }) {
   const [bundlrInstance, setBundlrInstance] = useState(null)
@@ -24,7 +23,6 @@ function MyApp({ Component, pageProps }) {
 
   async function fetchBalance() {
     const data = await bundlrInstance.getLoadedBalance() // 109864 
-    console.log('data: ', utils.formatEther(data.toString()))
     setBalance(utils.formatEther(data.toString()))
   }
 
@@ -32,11 +30,9 @@ function MyApp({ Component, pageProps }) {
     if (!window.ethereum) return
     const provider = new providers.Web3Provider(window.ethereum)
     const accounts = await provider.listAccounts()
-    console.log('accounts: ', accounts)
     if (!accounts.length) return
     try {
       const { record } = await getRecord()
-      console.log('record: ', record)
       if (record) {
         setProfile(record)
       } else {}
@@ -70,7 +66,7 @@ function MyApp({ Component, pageProps }) {
   async function connect() {
     await window.ethereum.request({ method: 'eth_requestAccounts' })
   
-    const provider = new providers.Web3Provider(window.ethereum);
+    const provider = new providers.Web3Provider(window.ethereum)
     await provider._ready()
   
     const bundlr = new WebBundlr("https://node1.bundlr.network", "matic", provider)

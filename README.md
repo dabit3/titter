@@ -6,11 +6,11 @@
 
 ### How it works
 
-This is a prototype of how you might build a web3-native social application. Features include:
+This is a working prototype of a basic web3-native social application. Features include:
 
 - Permanent post storage (Arweave)
-- User profiles (Ceramic [self.id](https://self.id/))
-- Basic [GraphQL queries](https://gql-guide.vercel.app/)
+- Editable, self-sovereign user profiles (Ceramic [self.id](https://self.id/))
+- [GraphQL queries](https://gql-guide.vercel.app/)
 - Filtering
 - Fund and check balance of Bundlr
 - [Pagination](https://gql-guide.vercel.app/#pagination) can also be implemented fairly easily with a few extra lines of code.

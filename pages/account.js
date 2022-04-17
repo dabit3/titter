@@ -1,4 +1,3 @@
-import styles from '../styles/Home.module.css'
 import { useContext, useState } from 'react'
 import BigNumber from 'bignumber.js'
 import { css } from '@emotion/css'
@@ -21,13 +20,13 @@ export default function Account() {
   async function fundWallet() {
     if (!price) return
     const priceParced = parseInput(price)
-    let response = await bundlrInstance.fund(priceParced);
+    let response = await bundlrInstance.fund(priceParced)
     console.log('Wallet funded: ', response)
     fetchBalance()
   }
 
   function parseInput (input) {
-    const conv = new BigNumber(input).multipliedBy(bundlrInstance.currencyConfig.base[1]);
+    const conv = new BigNumber(input).multipliedBy(bundlrInstance.currencyConfig.base[1])
     if (conv.isLessThan(1)) {
       console.log('error: value too small')
       return
