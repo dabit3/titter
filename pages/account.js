@@ -65,7 +65,7 @@ export default function Account() {
   const profileExists = Object.keys(profile).length
 
   return (
-    <div>
+    <div className={horizontalPaddingStyle}>
       <h2>Profile Information</h2>
       {
         !ceramicLoaded && (
@@ -147,6 +147,10 @@ export default function Account() {
     </div>
   )
 }
+
+const horizontalPaddingStyle = css`
+  padding: 15px 40px;
+`
 
 const formStyle = css`
   align-items: flex-start;

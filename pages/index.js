@@ -14,7 +14,7 @@ const topics = {
   daos: 'daos',
   web3: 'web3',
   solidity: 'solidity',
-  
+  events: 'events'
 }
 
 function App() {
@@ -60,7 +60,8 @@ function App() {
       createdBy: bundlrInstance.address,
       username: profile && profile.name ? profile.name : null,
       profileImage: profile && profile.profileImage ? profile.profileImage : null,
-      topic: topicToSave ? topicToSave : null
+      topic: topicToSave ? topicToSave : null,
+      emoji: getRandomEmoji()
     }
   
     let tx = await bundlrInstance.createTransaction(JSON.stringify(post), { tags })
@@ -81,7 +82,8 @@ function App() {
               createdBy: bundlrInstance.address,
               username: profile && profile.name ? profile.name : null,
               profileImage: profile && profile.profileImage ? profile.profileImage : null,
-              topic: topicToSave ? topicToSave : null
+              topic: topicToSave ? topicToSave : null,
+              emoji: post.emoji
             }
           }
         }, ...postInfos]
@@ -151,14 +153,14 @@ function App() {
   const balanceZero = balance === "0.0"
   
   return (
-    <div className="App">
+    <div>
       {
         !bundlrInstance ? (
-          <div>
+          <div className={horizontalPaddingStyle}>
              <button className={button} onClick={connectCeramic}>Connect wallet to start chatting!</button>
           </div>
         ) : balanceZero ? (
-          <div>
+          <div className={horizontalPaddingStyle}>
             <h4>
               Balance empty. Please fund wallet
               <Link href="/account">
@@ -188,7 +190,7 @@ function App() {
         )
       }
       {
-        isLoading && <h1>Loading chat...</h1>
+        isLoading && <h1 className={filtersContainerStyle}>Loading chat...</h1>
       }
       {
         !isLoading && (
@@ -220,7 +222,7 @@ function App() {
                           className={profileImageStyle}
                         />
                       ) : (
-                        <p className={emojiStyle}>{getRandomEmoji()}</p>
+                        <p className={emojiStyle}>{post.request.data.emoji ? post.request.data.emoji : getRandomEmoji()}</p>
                       )
                     }
                     <div className={postContainer}>
@@ -245,10 +247,16 @@ function App() {
   );
 }
 
+const horizontalPaddingStyle = css`
+  padding: 4px 30px;
+`
+
 const postWrapper = css`
   border-bottom: 1px solid rgba(0, 0, 0, .2);
   display: flex;
   align-items: flex-start;
+  border-top: 1px solid rgba(255, 255, 255, .1);
+  ${horizontalPaddingStyle},
   h1 {
     font-size: 40px;
     margin: 20px 30px 0px 0px;
@@ -271,6 +279,7 @@ const postContainer = css`
 `
 
 const postInputContainerStyle = css`
+  ${horizontalPaddingStyle},
   display: flex;
   flex-direction: column;
   width: 300px;
@@ -279,6 +288,7 @@ const postInputContainerStyle = css`
 const postInputStyle = css`
   padding: 12px;
   font-size: 22px;
+  min-width: 250px;
   border-radius: 7px;
   border-color: rgba(0, 0, 0, .05);
   &:focus {
@@ -308,6 +318,7 @@ const postListContainer = css`
 `
 
 const filtersContainerStyle = css`
+  ${horizontalPaddingStyle},
   margin-top: 50px;
   h3 {
     margin-bottom: 5px;
@@ -317,6 +328,7 @@ const filtersContainerStyle = css`
 const filterheaderStyle = css`
   display: flex;
   align-items: flex-start;
+  margin-top: 20px;
   h3 {
     margin: 0px;
   }

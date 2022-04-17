@@ -108,13 +108,17 @@ export async function webClient({
     provider = new EthereumAuthProvider(window.ethereum, address)
   }
 
-  await client.authenticate(provider)
+  try {
+    await client.authenticate(provider)
 
-  const selfId = new SelfID({ client })
-  const id = selfId.did._id
+    const selfId = new SelfID({ client })
+    const id = selfId.did._id
 
-  return {
-    client, id, selfId, error: null
+    return {
+      client, id, selfId, error: null
+    }
+  } catch (err) {
+    console.log('error authenticating...', err)
   }
 }
 

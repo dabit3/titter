@@ -43,23 +43,27 @@ function MyApp({ Component, pageProps }) {
 
   async function connectCeramic() {
     await connect()
-    const cdata = await webClient()
-    const { id, selfId, error } = cdata
-    if (error) {
-      console.log('error: ', error)
-      return
-    }
-    setSelfId(selfId)
     try {
-      const data = await selfId.get('basicProfile', id)
-      console.log('data: ', data)
-      if (data) {
-        setProfile(data)
-      } else {}
-      setCeramicLoaded(true)
+      const cdata = await webClient()
+      const { id, selfId, error } = cdata
+      if (error) {
+        console.log('error: ', error)
+        return
+      }
+      setSelfId(selfId)
+      try {
+        const data = await selfId.get('basicProfile', id)
+        console.log('data: ', data)
+        if (data) {
+          setProfile(data)
+        } else {}
+        setCeramicLoaded(true)
+      } catch (err) {
+        console.log({ err })
+        connectCeramic()
+      }
     } catch (err) {
-      console.log({ err })
-      connectCeramic()
+      console.log('error connecting ceramic...', err)
     }
   }
 
@@ -109,17 +113,22 @@ function MyApp({ Component, pageProps }) {
   )
 }
 
+
 const container = css`
-  padding: 20px 100px;
+  padding: 20px 0px;
   width: 900px;
   margin: 0 auto;
+  border-left: 1px solid rgba(255, 255, 255, .1);
+  border-right: 1px solid rgba(255, 255, 255, .1);
 `
 
 const navStyle = css`
   display: flex;
-  padding: 20px 70px;
+  padding: 20px 40px;
   width: 900px;
   margin: 0 auto;
+  border-left: 1px solid rgba(255, 255, 255, .1);
+  border-right: 1px solid rgba(255, 255, 255, .1);
 `
 
 const linkStyle = css`
