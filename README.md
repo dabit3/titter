@@ -2,7 +2,7 @@
 
 🛠 Built with [Next.js](https://nextjs.org/), [Arweave](https://www.arweave.org/), [Bundlr](https://bundlr.network/), [Ceramic](https://ceramic.network/), GraphQL, & [Polygon](https://polygon.technology/)
 
-![Titter](headerimage.jpg)
+![Titter](header-image.jpg)
 
 ### How it works
 
