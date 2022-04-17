@@ -7,6 +7,7 @@ import ReactMarkdown from 'react-markdown'
 import Link from 'next/link'
 
 const topics = {
+  gm: 'gm',
   degen: 'degen',
   nfts: 'nfts',
   defi: 'defi',
@@ -36,13 +37,13 @@ function App() {
   async function poll() {
     setInterval(() => {
       getPostInfo(topicFilterRef.current)
-    }, 30000)
+    }, 15000)
   }
 
   async function createPost() {
     if (!postInput) return
     const tags = [
-      { name: "App-Name", value: "TitterWeb3" },
+      { name: "App-Name", value: "Titter" },
       { name: "Content-Type", value: "text/plain" },
     ]
 

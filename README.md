@@ -10,12 +10,16 @@ This is a working prototype of a basic web3-native social application. Features 
 
 - Permanent post storage (Arweave)
 - Editable, self-sovereign user profiles (Ceramic [self.id](https://self.id/))
-- [GraphQL queries](https://gql-guide.vercel.app/)
-- Filtering
+- [GraphQL queries](https://gql-guide.vercel.app/) 
+- Filtering at protocol level (not on client)
 - Fund and check balance of Bundlr
-- [Pagination](https://gql-guide.vercel.app/#pagination) can also be implemented fairly easily with a few extra lines of code.
+- [Pagination](https://gql-guide.vercel.app/#pagination) can also be implemented fairly easily with a few extra lines of code at protocol level
 
-Caveats - Right now [there is an issue](https://github.com/Bundlr-Network/js-client/issues/35) with Bundlr + Arweave in that the gateway can miss Bundlr txs and think that it never hit Arweave (when it does). Hopefully this gets fixed soon.
+Caveats:
+
+1. Right now [there is an issue](https://github.com/Bundlr-Network/js-client/issues/35) with Bundlr + Arweave in that the gateway can miss Bundlr txs and think that it never hit Arweave (when it does). Hopefully this gets fixed soon.
+
+2. The extent to which you can query is limited by what is offered at the protocol level. The Graph [Arweave integration](https://thegraph.com/blog/graph-arweave) will unlock a lot more flexibility and power at some point in the near future.
 
 ## Deploying the app
 
