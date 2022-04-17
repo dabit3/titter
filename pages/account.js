@@ -182,7 +182,7 @@ const accountInfoStyle = css`
 
 const inputStyle = css`
   padding: 12px;
-  font-size: 16px;
+  font-size: 22px;
   border-radius: 7px;
   border-color: rgba(0, 0, 0, .05);
   &:focus {

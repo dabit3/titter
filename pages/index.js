@@ -1,4 +1,4 @@
-import { buildQuery, arweave, createPostInfo } from '../utils'
+import { buildQuery, arweave, createPostInfo, getRandomEmoji } from '../utils'
 import { useState, useEffect, useContext, useRef } from 'react'
 import { css } from '@emotion/css'
 import formatDistance from 'date-fns/formatDistance'
@@ -213,10 +213,16 @@ function App() {
               postInfos.map((post, i) => (
                 post.request.data.post && (
                   <div className={postWrapper} key={i} >
-                    <img
-                      src={post.request.data.profileImage}
-                      className={profileImageStyle}
-                    />
+                    {
+                      post.request.data.profileImage ? (
+                        <img
+                          src={post.request.data.profileImage}
+                          className={profileImageStyle}
+                        />
+                      ) : (
+                        <p className={emojiStyle}>{getRandomEmoji()}</p>
+                      )
+                    }
                     <div className={postContainer}>
                       <p>{post.request.data.username ? post.request.data.username : post.request.data.createdBy}</p>
                       <ReactMarkdown>{post.request.data.post}</ReactMarkdown>
@@ -329,6 +335,11 @@ const profileImageStyle = css`
   margin-right: 12px;
 `
 
+const emojiStyle = css`
+  font-size: 40px;
+  margin-right: 26px;
+`
+
 const filtersListStyle = css`
   display: flex;
   p {
@@ -344,7 +355,7 @@ const filtersListStyle = css`
 `
 
 const fundWalletLinkStyle = css`
-  color: #0080ff;
+  color: #b84cff;
 `
 
 const refreshImageStyle = css`
